@@ -161,3 +161,19 @@ function openImagePopup(imageSrc, imageAlt) {
 
   openModal(imagePopup);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
