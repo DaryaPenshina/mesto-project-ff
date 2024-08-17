@@ -1,10 +1,12 @@
-import { handleAddCardSubmit } from './card.js';
-import { openModal, closeModal } from './modal.js';
+import { handleAddCardSubmit } from "./card.js";
+import { openModal, closeModal } from "./modal.js";
+import '../../pages/index.css';
 
 const editButton = document.querySelector(".profile__edit-button");
 const addButton = document.querySelector(".profile__add-button");
 const closeButtons = document.querySelectorAll(".popup__close");
 const modals = document.querySelectorAll(".popup");
+
 
 // Элементы профиля
 const profileTitle = document.querySelector(".profile__title");
@@ -28,7 +30,7 @@ function handleFormSubmit(evt) {
   closeModal(document.querySelector(".popup_type_edit"));
 }
 
-  // Прикрепляем обработчики к формам
+// Прикрепляем обработчики к формам
 formElement.addEventListener("submit", handleFormSubmit);
 addCardForm.addEventListener("submit", handleAddCardSubmit);
 
@@ -60,21 +62,3 @@ modals.forEach((modal) => {
     }
   });
 });
-
-// Функция открытия попапа с изображением
-function openImagePopup(imageSrc, imageAlt) {
-  const imagePopup = document.querySelector(".popup_type_image");
-  const popupImage = imagePopup.querySelector(".popup__image");
-  const popupCaption = imagePopup.querySelector(".popup__caption");
-
-  popupImage.src = imageSrc;
-  popupImage.alt = imageAlt;
-  popupCaption.textContent = imageAlt;
-
-  openModal(imagePopup);
-}
-
-// Обработчик клика на изображение
-cardImage.addEventListener("click", () => {
-    openImagePopup(cardData.link, cardData.name);
-  });

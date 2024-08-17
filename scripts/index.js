@@ -76,7 +76,7 @@ function handleFormSubmit(evt) {
 
 // Отправка формы добавления карточки
 function handleAddCardSubmit(evt) {
-  evt.preventDefault(); // Отменяем стандартное поведение формы
+  evt.preventDefault(); 
 
   const cardName = document.querySelector(".popup__input_type_card-name").value;
   const cardLink = document.querySelector(".popup__input_type_url").value;
@@ -99,7 +99,7 @@ addCardForm.addEventListener("submit", handleAddCardSubmit);
 
 // открытие попапа
 function openModal(modal) {
-  modal.classList.add("popup_opened"); // Показываем попап
+  modal.classList.add("popup_opened"); 
   document.addEventListener("keydown", handleEsc);
 }
 
