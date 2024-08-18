@@ -1,13 +1,9 @@
-import {
-  handleLike,
-  createCard,
-  placesList,
-  handleCardDelete,
-} from "./card.js";
+import { handleLike, createCard, handleCardDelete } from "./card.js";
 import { openModal, closeModal } from "./modal.js";
 import { initialCards } from "./cards.js";
 import "../../pages/index.css";
 
+const placesList = document.querySelector(".places__list");
 const editButton = document.querySelector(".profile__edit-button");
 const addButton = document.querySelector(".profile__add-button");
 const closeButtons = document.querySelectorAll(".popup__close");
@@ -54,10 +50,16 @@ function handleAddCardSubmit(evt) {
   };
 
   // Создаем новую карточку
-  const newCard = createCard(newCardData);
+  const newCard = createCard(
+    newCardData,
+    handleCardDelete,
+    handleLike,
+    openImagePopup
+  );
+
+  // Добавляем созданную карточку на страницу
   placesList.prepend(newCard);
 
-  // Закрываем попап
   closeModal(popupAddNewCard);
 
   addCardForm.reset();

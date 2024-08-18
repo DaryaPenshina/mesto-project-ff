@@ -1,7 +1,5 @@
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector("#card-template").content;
-// @todo: DOM узлы
-const placesList = document.querySelector(".places__list");
 
 const createCard = (cardData, onDeleteCard, onLikeCard, openImagePopup) => {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
@@ -36,4 +34,4 @@ function handleCardDelete(cardElement) {
   cardElement.remove();
 }
 
-export { handleLike, createCard, placesList, handleCardDelete };
+export { handleLike, createCard, handleCardDelete };
