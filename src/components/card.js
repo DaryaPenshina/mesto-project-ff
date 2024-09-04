@@ -15,7 +15,7 @@ const createCard = (cardData, onDeleteCard, onLikeCard, openImagePopup) => {
   cardTitle.textContent = cardData.name;
 
   // Скрываем кнопку удаления, если карточка создана не пользователем
-  const currentUserId = '<fda5910683ca01ade205295d>'; 
+  const currentUserId = localStorage.getItem("currentUserId");
   if (cardData.owner && cardData.owner._id === currentUserId) {
     deleteCardButton.style.display = 'block'; 
   } else {
@@ -43,16 +43,12 @@ const createCard = (cardData, onDeleteCard, onLikeCard, openImagePopup) => {
   deleteCardButton.addEventListener("click", () => onDeleteCard(cardElement));
 
   // Обработчик клика на кнопку лайка
-  likeButton.addEventListener("click", () => onLikeCard(likeButton));
+  likeButton.addEventListener("click", () => onLikeCard(likeButton,cardData._id));
   return cardElement;
 };
-
-function handleLike(likeButton) {
-  likeButton.classList.toggle("card__like-button_active");
-}
 
 function handleCardDelete(cardElement) {
   cardElement.remove();
 }
 
-export { handleLike, createCard, handleCardDelete };
+export { createCard, handleCardDelete };
