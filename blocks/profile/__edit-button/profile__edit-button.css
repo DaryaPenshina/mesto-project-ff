@@ -1,7 +1,7 @@
 .profile__edit-button {
   width: 24px;
   height: 24px;
-  background: transparent url('../../../images/edit-icon.svg') center no-repeat;
+  background: transparent url("../../../images/edit-icon.svg") center no-repeat;
   background-size: 10px 10px;
   border: 1px solid #fff;
   grid-area: button;
@@ -18,12 +18,24 @@
 
 .profile__edit-button:hover {
   opacity: 0.6;
-}
-
+ }
 @media screen and (max-width: 480px) {
   .profile__edit-button {
     width: 18px;
     height: 18px;
     background-size: 8px 8px;
   }
+}
+.edit-avatar-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+}
+.edit-avatar-button:hover {
+  opacity: 1;
 }

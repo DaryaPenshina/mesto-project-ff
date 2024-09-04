@@ -7,11 +7,32 @@ const createCard = (cardData, onDeleteCard, onLikeCard, openImagePopup) => {
   const cardTitle = cardElement.querySelector(".card__title");
   const deleteCardButton = cardElement.querySelector(".card__delete-button");
   const likeButton = cardElement.querySelector(".card__like-button");
+  const likeCount = cardElement.querySelector(".card__like-count");
 
   // Устанавливаем данные карточки
   cardImage.src = cardData.link;
   cardImage.alt = cardData.name;
   cardTitle.textContent = cardData.name;
+
+  // Скрываем кнопку удаления, если карточка создана не пользователем
+  const currentUserId = '<fda5910683ca01ade205295d>'; 
+  if (cardData.owner && cardData.owner._id === currentUserId) {
+    deleteCardButton.style.display = 'block'; 
+  } else {
+    deleteCardButton.style.display = 'none'; 
+  }
+
+  if (Array.isArray(cardData.likes)) {
+    likeCount.textContent = cardData.likes.length; 
+  } else {
+    likeCount.textContent = '0'; 
+  }
+
+  // Проверка статуса лайка у пользователя
+  const isLiked = Array.isArray(cardData.likes) && cardData.likes.some(user => user._id === currentUserId);
+  if (isLiked) {
+    likeButton.classList.add("card__like-button_active");
+  }
 
   // Обработчик клика на изображение
   cardImage.addEventListener("click", () => {
