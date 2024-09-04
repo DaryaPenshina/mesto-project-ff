@@ -12,16 +12,6 @@ import {
   updateAvatar,
 } from "./api.js";
 
-function handleLike(likeButton, cardId) {
-  if (likeButton.classList.contains("card__like-button_active")) {
-    likeButton.classList.remove("card__like-button_active");
-    unlikeCard(cardId);
-  } else {
-    likeButton.classList.add("card__like-button_active");
-    likeCard(cardId);
-  }
-}
-
 const placesList = document.querySelector(".places__list");
 const editButton = document.querySelector(".profile__edit-button");
 const addButton = document.querySelector(".profile__add-button");
