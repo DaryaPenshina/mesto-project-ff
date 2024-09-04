@@ -213,6 +213,17 @@ modals.forEach((modal) => {
   });
 });
 
+// Лайк
+function handleLike(likeButton, cardId) {
+  if (likeButton.classList.contains("card__like-button_active")) {
+    likeButton.classList.remove("card__like-button_active");
+    unlikeCard(cardId);
+  } else {
+    likeButton.classList.add("card__like-button_active");
+    likeCard(cardId);
+  }
+}
+
 import { enableValidation, clearValidation } from "./validation.js";
 
 // Включение валидации
