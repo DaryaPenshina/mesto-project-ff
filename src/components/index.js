@@ -1,4 +1,4 @@
-import { createCard, handleCardDelete } from "./card.js";
+import { createCard } from "./card.js";
 import { openModal, closeModal } from "./modal.js";
 import { initialCards } from "./cards.js";
 import "../../pages/index.css";
@@ -7,8 +7,6 @@ import {
   getUserInfo,
   updateUserInfo,
   addCard,
-  likeCard,
-  unlikeCard,
   updateAvatar,
 } from "./api.js";
 
@@ -38,55 +36,50 @@ const popupCaptionText = imagePopup.querySelector(".popup__caption");
 const deleteCardPopup = document.querySelector(".popup_type_delete-card");
 const closeDeleteCardButton = deleteCardPopup.querySelector(".popup__close");
 const deleteCardForm = deleteCardPopup.querySelector(".popup__form");
-let currentCard;
+let cardId;
+let cardElement;
 
 // Функция, открывающая попап удаления карточки
-function openDeleteCardPopup(cardElement) {
-  currentCard = cardElement;
+function openDeleteCardPopup(cardId, cardElement, onConfirmDelete) {
   openModal(deleteCardPopup);
+
+  const form = deleteCardPopup.querySelector(".popup__form");
+
+  form.onsubmit = (event) => {
+    event.preventDefault();
+
+    if (cardElement && cardId) {
+      onConfirmDelete(cardElement, cardId);
+      closeModal(deleteCardPopup);
+    } else {
+      console.error("Текущая карточка не определена.");
+    }
+  };
 }
 
-// Закрытие попапа удаления карточки
-closeDeleteCardButton.addEventListener("click", () => {
-  closeModal(deleteCardPopup);
-});
-
-// Обработчик отправки формы для удаления карточки
-deleteCardForm.addEventListener("submit", (evt) => {
-  evt.preventDefault();
-  handleCardDelete(currentCard);
-  closeModal(deleteCardPopup);
-});
-
-// Отправка формы добавления карточки
 function handleAddCardSubmit(evt) {
   evt.preventDefault();
   const cardName = inputNameFormAddNewCard.value;
   const cardLink = inputLinkFormAddNewCard.value;
 
+  const addCardButton = addCardForm.querySelector(".popup__button");
+  addCardButton.textContent = "Сохранение...";
+  addCardButton.disabled = true;
+
   addCard(cardName, cardLink)
     .then((data) => {
-      const addCardButton = addCardForm.querySelector(".popup__button");
-      addCardButton.textContent = "Сохранение...";
-      addCardButton.disabled = true;
-
-      // Создаем новую карточку
-      const newCard = createCard(
-        data,
-        openDeleteCardPopup,
-        handleLike,
-        openImagePopup
-      );
+      const newCard = createCard(data, openDeleteCardPopup, openImagePopup);
 
       placesList.prepend(newCard);
       closeModal(popupAddNewCard);
       addCardForm.reset();
-
-      addCardButton.textContent = "Создать";
-      addCardButton.disabled = false;
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      addCardButton.textContent = "Создать";
+      addCardButton.disabled = false;
     });
 }
 
@@ -108,14 +101,14 @@ function handleProfileEditFormSubmit(evt) {
     .then((updatedUser) => {
       profileTitle.textContent = updatedUser.name;
       profileDescription.textContent = updatedUser.about;
-
       closeModal(editProfileModal);
-
-      profileEditButton.textContent = "Сохранить";
-      profileEditButton.disabled = false;
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      profileEditButton.textContent = "Сохранить";
+      profileEditButton.disabled = false;
     });
 }
 // Добавляем переменные для попапа смены аватара
@@ -125,6 +118,9 @@ const closeAvatarPopupButton = avatarPopup.querySelector(
 );
 const avatarForm = avatarPopup.querySelector(".popup__form_type_change-avatar");
 const profileImage = document.querySelector(".profile__image");
+
+// Прикрепляем обработчики к форме смены аватара
+avatarForm.addEventListener("submit", handleAvatarFormSubmit);
 
 // Обработчик отправки формы для смены аватара
 function handleAvatarFormSubmit(evt) {
@@ -137,15 +133,16 @@ function handleAvatarFormSubmit(evt) {
 
   updateAvatar(avatarUrl)
     .then((editAvatar) => {
-      profileImage.style.backgroundImage = editAvatar.avatar;
+      profileImage.style.backgroundImage = `url(${editAvatar.avatar})`;
       closeModal(avatarPopup);
       avatarForm.reset();
-
-      avatarButton.textContent = "Сохранить";
-      avatarButton.disabled = false;
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      avatarButton.textContent = "Сохранить";
+      avatarButton.disabled = false;
     });
 }
 
@@ -153,14 +150,6 @@ function handleAvatarFormSubmit(evt) {
 document.querySelector(".edit-avatar-button").addEventListener("click", () => {
   openModal(avatarPopup);
 });
-
-// Закрытие попапа смены аватара
-closeAvatarPopupButton.addEventListener("click", () => {
-  closeModal(avatarPopup);
-});
-
-// Прикрепляем обработчики к форме смены аватара
-avatarForm.addEventListener("submit", handleAvatarFormSubmit);
 
 // Прикрепляем обработчики к формам
 profileEditForm.addEventListener("submit", handleProfileEditFormSubmit);
@@ -203,28 +192,20 @@ modals.forEach((modal) => {
   });
 });
 
-// Лайк
-function handleLike(likeButton, cardId) {
-  if (likeButton.classList.contains("card__like-button_active")) {
-    likeButton.classList.remove("card__like-button_active");
-    unlikeCard(cardId);
-  } else {
-    likeButton.classList.add("card__like-button_active");
-    likeCard(cardId);
-  }
-}
-
 import { enableValidation, clearValidation } from "./validation.js";
 
-// Включение валидации
-enableValidation({
+// Объект с настройками
+const settings = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
   inactiveButtonClass: "popup__button_disabled",
   inputErrorClass: "popup__input_type_error",
   errorClass: "popup__error_visible",
-});
+};
+
+// Включение валидации
+enableValidation(settings);
 
 // Код для добавления обработчиков событий
 document.addEventListener("DOMContentLoaded", () => {
@@ -267,10 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (editButton) {
     editButton.addEventListener("click", () => {
       if (profileForm) {
-        clearValidation(profileForm, {
-          inputSelector: ".popup__input",
-          submitButtonSelector: ".popup__button",
-        });
+        clearValidation(profileForm, settings);
         toggleSubmitButton(profileForm);
       }
     });
@@ -280,10 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (addButton) {
     addButton.addEventListener("click", () => {
       if (cardForm) {
-        clearValidation(cardForm, {
-          inputSelector: ".popup__input",
-          submitButtonSelector: ".popup__button",
-        });
+        clearValidation(cardForm, settings);
         toggleSubmitButton(cardForm);
       }
     });
@@ -293,10 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (changeAvatarButton) {
     changeAvatarButton.addEventListener("click", () => {
       if (avatarForm) {
-        clearValidation(avatarForm, {
-          inputSelector: ".popup__input",
-          submitButtonSelector: ".popup__button",
-        });
+        clearValidation(avatarForm, settings);
         toggleSubmitButton(avatarForm);
       }
     });
@@ -312,21 +284,22 @@ document.addEventListener("DOMContentLoaded", () => {
 Promise.all([getInitialCards(), getUserInfo()])
   .then(([cards, user]) => {
     const profileImage = document.querySelector(".profile__image");
-    profileImage.style = `background-image: url(${user.avatar})`;
+    profileImage.style.backgroundImage = `url(${user.avatar}`;
     localStorage.setItem("currentUserId", user._id);
     const profileName = document.querySelector(".profile__title");
     profileName.textContent = user.name;
     const profileInfo = document.querySelector(".profile__description");
     profileInfo.textContent = user.about;
 
+    // Создание карточек
     cards.reverse().forEach((cardData) => {
       const newCardData = {
         ...cardData,
       };
+      // Передаем openImagePopup как аргумент
       const newCard = createCard(
         newCardData,
         openDeleteCardPopup,
-        handleLike,
         openImagePopup
       );
       placesList.prepend(newCard);
